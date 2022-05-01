@@ -1,0 +1,28 @@
+<body>
+  <div></div>
+  <p></p>
+</body>
+
+<script type="module">
+  import { setViewEffect, reactive } from './reactive.js';
+  const div = document.querySelector('div');
+  const p = document.querySelector('p');
+
+  const obj = reactive({
+    divMsg: 'div is waiting',
+    pMsg: 'p is waiting'
+  });
+
+  setViewEffect(() => {
+    div.innerText = obj.divMsg;
+  })
+
+  setViewEffect(() => {
+    p.innerText = obj.pMsg;
+  })
+  
+  setTimeout(() => {
+    obj.divMsg = 'divMsg changes';
+    obj.pMsg = 'pMsg changes';
+  }, 2000);
+</script>
