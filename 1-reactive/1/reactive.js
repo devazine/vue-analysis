@@ -33,7 +33,7 @@ const baseHandlers = {
     },
     set(target, key, value, receiver) {
         const res = Reflect.set(target, key, value, receiver);
-        trigger(target, key, value);
+        trigger(target, key);
         return res;
     }
 }
@@ -48,18 +48,16 @@ const track = (target, key) => {
     if (!dep) {
         depsMap.set(key, (dep = new Set()));
         dep.add(viewEffect);
-        console.log(`Key "${key}" is traced...`);
     }
 }
 
 // 触发
-const trigger = (target, key, value) => {
+const trigger = (target, key) => {
     const depsMap = targetMap.get(target);
     if (!depsMap) {
         // 未被追踪过
         return
     }
     const viewEffects = depsMap.get(key);
-    console.log(`Trggering effects Functions of key "${key}"...`);
     viewEffects.forEach(effectFn => effectFn());
 }

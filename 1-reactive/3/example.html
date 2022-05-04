@@ -1,0 +1,29 @@
+<body>
+  <div id="ownKeys-array"></div>
+</body>
+
+<script type="module">
+  import { setViewEffect, reactive } from './reactive.js';
+  const ownKeysArrDom = document.querySelector('#ownKeys-array');
+
+  const arr = reactive(['a', 'b', 'c']);
+
+  setViewEffect(() => {
+    let html = '';
+    for(let index in arr) {  // 触发 ownKeys 拦截器
+      html += arr[index];
+    }
+
+    html += arr[2] ? '（索引为 2 的元素还在）' : '（索引为 2 的元素被移除了）';
+
+    ownKeysArrDom.innerText = html;
+  });
+
+  setTimeout(() => {
+    arr[3] = 'd';
+  }, 2000);
+
+  setTimeout(() => {
+    arr.length = 2;
+  }, 4000);
+</script>

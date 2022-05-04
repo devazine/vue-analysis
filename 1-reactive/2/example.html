@@ -1,0 +1,45 @@
+<body>
+  <div id="has"></div>
+  <div id="ownKeys-object"></div>
+</body>
+
+<script type="module">
+  import { setViewEffect, reactive } from './reactive.js';
+  const hasDom = document.querySelector('#has');
+  const ownKeysObjDom = document.querySelector('#ownKeys-object');
+
+  const obj = reactive({
+    div: { msg: 'hasDom msg :)' },
+  });
+
+  setViewEffect(() => {
+    if ('msg' in obj.div) {
+      hasDom.innerText = 'obj.div.msg 在 has 拦截器中被追踪';
+    } else {
+      hasDom.innerText = 'delete 拦截器触发了副作用函数'
+    }
+  });
+
+  setTimeout(() => {
+    delete obj.div.msg;
+  }, 2000);
+  
+  const obj2 = reactive({
+    a: 'a',
+    b: 'b',
+    c: 'c'
+  });
+
+  setViewEffect(() => {
+    let html = '';
+    for(let s in obj2) {  // 触发 ownKeys 拦截器
+      html += s;
+    }
+
+    ownKeysObjDom.innerText = html;
+  });
+
+  setTimeout(() => {
+    obj2.d = 'd';  // 新增属性也能触发 ownKeys 阶段收集到的依赖
+  }, 2000);
+</script>
