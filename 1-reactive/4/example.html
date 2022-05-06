@@ -1,0 +1,16 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { setViewEffect, reactive } from './reactive.js';
+  const div = document.querySelector('div');
+
+  let arr = reactive(['a', 'b', 'c']);
+
+  setViewEffect(() => {
+    arr.push('d');
+    div.innerText = arr.reduce((p, c) => (p + c))
+  });
+
+</script>

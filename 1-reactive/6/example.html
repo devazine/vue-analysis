@@ -1,0 +1,20 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { reactive } from './reactive.js';
+  import { setViewEffect } from './effect.js';
+  
+  const div = document.querySelector('div');
+
+  const obj = reactive({ a: 1 });
+
+  setViewEffect(() => {
+    div.innerText += obj.b + '\n';
+  });
+
+  obj.b = 2;
+
+
+</script>

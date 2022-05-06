@@ -1,10 +1,10 @@
-import { isObject, isArray, hasOwn, isIntegerKey } from './shared.js'
+import { isObject, isArray, hasOwn, isIntegerKey, hasChanged } from './shared.js'
 
 const proxyMap = new WeakMap();
 const targetMap = new WeakMap();
 const ITERATE_KEY = Symbol();
 
-let viewEffect = () => { };
+let viewEffect;
 
 export const setViewEffect = (fn) => {
     viewEffect = fn;
@@ -26,8 +26,66 @@ export function reactive(target) {
     return proxy
 }
 
+export let shouldTrack = true;
+const trackStack = [];
+
+export function pauseTracking() {
+    trackStack.push(shouldTrack)
+    shouldTrack = false
+}
+
+export function resetTracking() {
+    const last = trackStack.pop()
+    shouldTrack = last === undefined ? true : last
+}
+
+function toRaw(observed) {
+    const raw = observed && observed["__v_raw"];
+    return raw ? toRaw(raw) : observed;
+}
+
+function createArrayInstrumentations() {
+    const instrumentations = {};
+    ['includes', 'indexOf', 'lastIndexOf'].forEach(key => {
+        instrumentations[key] = function (...args) {
+            const arr = toRaw(this);
+            for (let i = 0, l = this.length; i < l; i++) {
+                track(arr, "get", i + '');
+            }
+            const res = arr[key](...args);
+            if (res === -1 || res === false) {
+                return arr[key](...args.map(toRaw));
+            } else {
+                return res;
+            }
+        };
+    });
+
+    ['push', 'pop', 'shift', 'unshift', 'splice'].forEach(key => {
+        instrumentations[key] = function (...args) {
+            pauseTracking();
+            const res = toRaw(this)[key].apply(this, args);
+            resetTracking();
+            return res
+        }
+    })
+    return instrumentations
+}
+
+const arrayInstrumentations = createArrayInstrumentations();
+
 const baseHandlers = {
     get(target, key, receiver) {
+        if (key === "__v_raw" && proxyMap.get(target)) {
+            return target;
+        }
+
+        const targetIsArray = isArray(target);
+
+        if (targetIsArray && hasOwn(arrayInstrumentations, key)) {
+            return Reflect.get(arrayInstrumentations, key, receiver)
+        }
+
         const res = Reflect.get(target, key, receiver);
         track(target, key);
 
@@ -38,12 +96,22 @@ const baseHandlers = {
         return res;
     },
     set(target, key, value, receiver) {
+        let oldValue = target[key];  // 新增
+        // 新旧值都有可能属于响应式对象
+        // 将它们都转为原生引用，方便做对比
+        value = toRaw(value);
+        oldValue = toRaw(oldValue);
+
         const hadKey = isArray(target) && isIntegerKey(key)
             ? Number(key) < target.length
             : hasOwn(target, key);
 
         const res = Reflect.set(target, key, value, receiver);
-        trigger(target, key, hadKey ? 'set' : 'add', value);  // 新增传入 value 参数
+        if (!hadKey) {
+            trigger(target, key, 'add', value)
+        } else if (hasChanged(value, oldValue)) {  // 新增判断
+            trigger(target, key, 'set', value)
+        }
         return res;
     },
     has(target, key) {
@@ -52,7 +120,7 @@ const baseHandlers = {
         return res;
     },
     ownKeys(target) {
-        const key = isArray(target) ? 'length' : ITERATE_KEY;  // 数组改用 length 为凭证
+        const key = isArray(target) ? 'length' : ITERATE_KEY;
         track(target, key);
         return Reflect.ownKeys(target);
     },
@@ -67,6 +135,7 @@ const baseHandlers = {
 }
 
 const track = (target, key) => {
+    if (!shouldTrack || !viewEffect) return;
     let depsMap = targetMap.get(target)
     if (!depsMap) {
         targetMap.set(target, (depsMap = new Map()))
@@ -78,7 +147,7 @@ const track = (target, key) => {
     }
 }
 
-const trigger = (target, key, type, newValue) => {  // 新增 newValue 参数
+const trigger = (target, key, type, newValue) => {
     const depsMap = targetMap.get(target);
     if (!depsMap) {
         return
@@ -86,14 +155,9 @@ const trigger = (target, key, type, newValue) => {  // 新增 newValue 参数
 
     let deps = [];
 
-    // 新增判断，若用户修改了数组的 length 属性，需要取出相关依赖
     if (key === 'length' && isArray(target)) {
-        // 注意 Map 的 forEach 参数为 (MapValue, MapKey)
         depsMap.forEach((dep, key) => {
-            // newValue 在这里为用户赋予 length 的新值
             if (key === 'length' || key >= newValue) {
-                // 当 depsMap 含有以 length 为凭证，或以被移除元素的索引值为凭证的依赖时，
-                // 取出该依赖
                 deps.push(dep)
             }
         })
@@ -106,8 +170,8 @@ const trigger = (target, key, type, newValue) => {  // 新增 newValue 参数
             case 'add':
                 if (!isArray(target)) {
                     deps.push(depsMap.get(ITERATE_KEY));
-                } else if (isIntegerKey(key)) {  // 若属性为索引字符串
-                    deps.push(depsMap.get('length'))  // 取出 ownKeys 阶段收集的依赖
+                } else if (isIntegerKey(key)) {
+                    deps.push(depsMap.get('length'))
                 }
                 break;
             case 'delete':

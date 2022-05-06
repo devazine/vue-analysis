@@ -1,0 +1,23 @@
+<body>
+  <div id="div-1"></div>
+  <div id="div-2"></div>
+</body>
+
+<script type="module">
+  import { setViewEffect, reactive } from './reactive.js';
+  const div1 = document.querySelector('#div-1');
+  const div2 = document.querySelector('#div-2');
+
+  const obj = {a: 1};
+  const observedObj = reactive(obj);
+
+  const arr = ['a', obj, 'c'];
+  const observedArr = reactive(arr);
+
+  const arr2 = ['a', observedObj, 'c'];
+  const observedArr2 = reactive(arr2);
+  
+  div1.innerText = 'arr 中是否包含了 obj 对象：' + observedArr.includes(obj);
+  div2.innerText += 'arr2 中是否包含了 obj 响应式对象：' + observedArr2.includes(observedObj);
+
+</script>
