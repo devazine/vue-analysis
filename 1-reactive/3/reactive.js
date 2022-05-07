@@ -74,8 +74,8 @@ const track = (target, key) => {
     let dep = depsMap.get(key)
     if (!dep) {
         depsMap.set(key, (dep = new Set()));
-        dep.add(viewEffect);
     }
+    dep.add(viewEffect);
 }
 
 const trigger = (target, key, type, newValue) => {  // 新增 newValue 参数

@@ -1,6 +1,6 @@
 import { mutableHandlers } from './baseHandlers.js'
 
-const proxyMap = new WeakMap();
+export const proxyMap = new WeakMap();
 export const ReactiveFlags = {
     RAW: '__v_raw'
 };

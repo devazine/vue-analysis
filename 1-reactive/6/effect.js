@@ -3,15 +3,15 @@ import { isArray, isIntegerKey } from './shared.js'
 const targetMap = new WeakMap();
 export const ITERATE_KEY = Symbol();
 
+export let shouldTrack = true;
+const trackStack = [];
+
 let viewEffect;
 
 export const setViewEffect = (fn) => {
     viewEffect = fn;
     fn();
 }
-
-export let shouldTrack = true;
-const trackStack = [];
 
 export function pauseTracking() {
     trackStack.push(shouldTrack)
@@ -32,8 +32,9 @@ export const track = (target, key) => {
     let dep = depsMap.get(key)
     if (!dep) {
         depsMap.set(key, (dep = new Set()));
-        dep.add(viewEffect);
     }
+
+    dep.add(viewEffect);
 }
 
 export const trigger = (target, key, type, newValue) => {

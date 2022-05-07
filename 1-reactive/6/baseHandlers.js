@@ -1,5 +1,5 @@
 import { isObject, isArray, hasOwn, isIntegerKey, hasChanged } from './shared.js'
-import { reactive, toRaw, ReactiveFlags } from './reactive.js'
+import { reactive, toRaw, ReactiveFlags, proxyMap } from './reactive.js'
 import { track, trigger, ITERATE_KEY, pauseTracking, resetTracking } from './effect.js'
 
 function createArrayInstrumentations() {
