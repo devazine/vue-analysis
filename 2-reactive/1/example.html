@@ -1,0 +1,29 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { reactive } from './reactive.js';
+  import { effect } from './effect.js';
+
+  const div = document.querySelector('div');
+
+  const arr = reactive(['a', 'b', 'c']);
+
+  effect(() => {
+    arr.push('0');
+    div.innerText = arr.reduce((prev, cur) => (prev + cur))
+  });
+  
+  
+  
+  
+
+  
+  console.log('----------------');
+  
+  arr.push('1');
+  // arr.push('d');
+  arr[3] = 3
+  console.log(arr);
+</script>
