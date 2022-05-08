@@ -159,6 +159,7 @@ const trigger = (target, key, type, newValue) => {
     viewEffects = new Set(viewEffects);
 
     viewEffects.forEach(effectFn => {
+        shouldTrack = true;  // 新增
         effectFn && effectFn()
     });
 }
