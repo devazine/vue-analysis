@@ -10,8 +10,6 @@ export const shallowReadonlyMap = new WeakMap();  // 新增
 
 export const ReactiveFlags = {
     RAW: '__v_raw',
-    IS_READONLY: '__v_isReadonly',
-    IS_SHALLOW: '__v_isShallow',  // 新增
 };
 
 export function reactive(target) {
@@ -74,15 +72,6 @@ export function shallowReadonly(target) {
 
     shallowReadonlyMap.set(target, proxy);
     return proxy
-}
-
-// 新增
-export function isShallow(value) {
-    return !!(value && value[ReactiveFlags.IS_SHALLOW]);
-}
-
-export function isReadonly(value) {
-    return !!(value && value[ReactiveFlags.IS_READONLY]);
 }
 
 export function toRaw(observed) {

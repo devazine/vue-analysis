@@ -5,7 +5,6 @@ export const readonlyMap = new WeakMap();  // 新增
 
 export const ReactiveFlags = {
     RAW: '__v_raw',
-    IS_READONLY: '__v_isReadonly',  // 新增
 };
 
 export function reactive(target) {
@@ -37,11 +36,6 @@ export function readonly(target) {
 
     readonlyMap.set(target, proxy);
     return proxy
-}
-
-// 新增
-export function isReadonly(value) {
-    return !!(value && value[ReactiveFlags.IS_READONLY]);
 }
 
 export function toRaw(observed) {

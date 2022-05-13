@@ -12,14 +12,12 @@ class ReactiveEffect {
     constructor(fn) {
         this.fn = fn;
         this.deps = [];
-        this.parent = undefined;  // 新增
+        this.parent = undefined; 
     }
     run() {
-        // 新增
         let parent = activeEffect;
         let lastShouldTrack = shouldTrack;
         while (parent) {
-            // 如果自己内部嵌套了自己，退出 run 执行
             if (parent === this) {
                 return;
             }
@@ -27,22 +25,16 @@ class ReactiveEffect {
         }
 
         try {
-            this.parent = activeEffect;  // 加上父级信息
+            this.parent = activeEffect;
             activeEffect = this;
             shouldTrack = true;
             cleanupEffect(this);
             return this.fn();
-        } finally { // 子级执行完，会回到父级继续执行，需要恢复父级信息
-            activeEffect = this.parent;  // 执行完重置 activeEffect 为父级实例
-            shouldTrack = lastShouldTrack;  // 执行完恢复父级的 shouldTrack 状态
-            this.parent = undefined;  // 执行完重置父级属性，避免污染未来的再次调用
+        } finally {
+            activeEffect = this.parent; 
+            shouldTrack = lastShouldTrack; 
+            this.parent = undefined; 
         }
-
-        // 删除
-        // activeEffect = this;
-        // shouldTrack = true;
-        // cleanupEffect(this);
-        // return this.fn();
     }
 }
 

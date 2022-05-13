@@ -2,7 +2,7 @@ import { isObject, isArray, hasOwn, isIntegerKey, hasChanged, isSymbol } from '.
 import {
     reactive, readonly,
     toRaw, ReactiveFlags, proxyMap, readonlyMap, shallowReactiveMap, shallowReadonlyMap
-} from './reactive.js'  // 新增 shallowReactiveMap、shallowReadonlyMap 引入
+} from './reactive.js'
 import { track, trigger, ITERATE_KEY, pauseTracking, resetTracking } from './effect.js'
 
 function createArrayInstrumentations() {
@@ -44,9 +44,8 @@ const builtInSymbols = new Set(
         .filter(isSymbol)
 )
 
-function createGetter(isReadonly = false, shallow = false) {  // 新增 shallow 参数
+function createGetter(isReadonly = false, shallow = false) {
     return function get(target, key, receiver) {
-        // 新增判断，获取浅响应或浅只读对应的 WeakMap 容器
         const targetFromMap = (isReadonly
             ? shallow
                 ? shallowReadonlyMap
@@ -55,7 +54,14 @@ function createGetter(isReadonly = false, shallow = false) {  // 新增 shallow 
                 ? shallowReactiveMap
                 : proxyMap
         ).get(target);
-        if (key === ReactiveFlags.RAW && targetFromMap) {
+
+        if (key === ReactiveFlags.IS_REACTIVE) {  // 新增
+            return !isReadonly
+        } else if (key === ReactiveFlags.IS_READONLY) {  // 新增
+            return isReadonly
+        } else if (key === ReactiveFlags.IS_SHALLOW) {  // 新增
+            return shallow
+        } else if (key === ReactiveFlags.RAW && targetFromMap) {
             return target;
         }
 
@@ -75,7 +81,7 @@ function createGetter(isReadonly = false, shallow = false) {  // 新增 shallow 
             track(target, key);
         }
 
-        if (shallow) {  // 新增，若为浅响应，直接返回属性值
+        if (shallow) {
             return res
         }
 
@@ -151,7 +157,6 @@ export const readonlyHandlers = {
     }
 }
 
-// 新增
 export const shallowReactiveHandlers = Object.assign(
     {},
     mutableHandlers,
@@ -161,7 +166,6 @@ export const shallowReactiveHandlers = Object.assign(
     }
 )
 
-// 新增
 export const shallowReadonlyHandlers = Object.assign(
     {},
     readonlyHandlers,

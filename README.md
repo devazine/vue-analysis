@@ -24,3 +24,4 @@ Devazine [《Vue 源码解析》](https://devazine.github.io/#/source-analysis/v
 
 - `3-reactive/1-readonly` : 一. 只读接口
 - `3-reactive/2-shallow` : 二. 浅响应和浅只读接口
+- `3-reactive/3` : 三. markRaw - 四. 工具方法补充

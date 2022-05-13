@@ -1,0 +1,21 @@
+<body>
+  <div></div>
+  <div id="div2"></div>
+</body>
+
+<script type="module">
+  import { markRaw, reactive } from './reactive.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+  const obj = markRaw({
+    msg: 'old msg'
+  });
+  const obj2 = reactive(obj);
+  
+  effect(() => {
+    div.innerText = obj2.msg
+  })
+
+  obj2.msg = 'latest msg';  // 不会触发副作用函数执行
+
+</script>
