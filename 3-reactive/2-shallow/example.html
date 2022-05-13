@@ -1,0 +1,43 @@
+<body>
+  <div></div>
+  <div id="div2"></div>
+</body>
+
+<script type="module">
+  import { shallowReactive, shallowReadonly } from './reactive.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+
+  // 浅响应
+  const shallowReactiveData = shallowReactive({
+    a: '[old a]',
+    b: {
+      msg: '[old b]'
+    }
+  });
+
+  effect(() => {
+    div.innerText = '[浅响应] ' + shallowReactiveData.a + '；' + shallowReactiveData.b.msg;
+  });
+
+  setTimeout(() => {
+    shallowReactiveData.a = '[latest a]';  // 不会生效
+    shallowReactiveData.b.msg = '[latest b]';  // 生效
+  }, 2000);
+
+  // 浅只读
+  const div2 = document.querySelector('#div2');
+
+  const shallowReadonlyData = shallowReadonly({
+    a: '[old a]',
+    b: {
+      msg: '[old b]'
+    }
+  });
+  
+  shallowReadonlyData.a = '[latest a]';  // 不会生效
+  shallowReadonlyData.b.msg = '[latest b]';
+
+  div2.innerText = '[浅只读] ' + shallowReadonlyData.a + '；' + shallowReadonlyData.b.msg;
+
+</script>

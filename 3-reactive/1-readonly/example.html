@@ -1,0 +1,19 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { readonly } from './reactive.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+
+  const readOnlyData = readonly({
+    msg: 'old msg',
+  });
+
+  effect(() => {
+    div.innerText = readOnlyData.msg;
+  });
+
+  readOnlyData.msg = 'latest msg';  // 不会生效
+</script>

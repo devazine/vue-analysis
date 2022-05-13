@@ -1,0 +1,30 @@
+<body>
+  <div id="effect1"></div>
+  <div id="effect2"></div>
+</body>
+
+<script type="module">
+  import { reactive } from './reactive.js';
+  import { effect } from './effect.js';
+
+  const div1 = document.querySelector('#effect1');
+  const div2 = document.querySelector('#effect2');
+
+  const data = reactive({
+    msg1: 'msg1',
+    msg2: 'msg2'
+  })
+
+  effect(function effectFn1() {
+    console.log('running effect1...')
+    effect(function effectFn2() {
+      console.log('running effect2...')
+      div2.innerText = data.msg2;
+    });
+
+    div1.innerText = data.msg1;
+  });
+
+  data.msg1 = 'msg1 changes..';
+
+</script>
