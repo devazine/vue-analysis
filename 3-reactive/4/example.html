@@ -1,0 +1,17 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { reactive } from './reactive.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+  const set = reactive(new Set(['a', 'b']));
+  
+  effect(() => {
+    div.innerText = Array.from(set.keys());
+  });
+
+  set.delete('a')
+  set.add('c');
+</script>

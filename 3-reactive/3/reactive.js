@@ -25,7 +25,8 @@ function createReactiveObject(target, handler, map) {
         return existingProxy
     }
 
-    if(target[ReactiveFlags.SKIP]) {  // 新增
+    // 新增，被 markRaw 标记了的对象、非数组类型或不可扩展数组是不能被代理的，直接返回原始内容
+    if (target[ReactiveFlags.SKIP] || !isObject(target) || !Object.isExtensible(target)) {
         return target
     }
 
