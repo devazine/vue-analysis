@@ -1,0 +1,20 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { shallowRef } from './ref.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+  const msg = shallowRef({info: 'Hello!'});
+  
+  effect(() => {
+    div.innerText = msg.value.info;
+  });
+
+  msg.value.info = 'OK!';  // 不会生效，不合理的写法
+
+  setTimeout(() => {
+    msg.value = {info: 'Bye~'};  // 会生效
+  }, 1000)
+</script>

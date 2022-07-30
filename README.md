@@ -26,3 +26,9 @@ Devazine [《Vue 源码解析》](https://devazine.github.io/#/source-analysis/v
 - `3-reactive/2-shallow` : 二. 浅响应和浅只读接口
 - `3-reactive/3` : 三. markRaw - 四. 工具方法补充
 - `3-reactive/4` : 五. 代理集合类型
+
+## [ref 的实现（上）](https://devazine.github.io/#/source-analysis/vue/6/)：
+
+- `4-ref/1` : 一. ref 的基础实现
+- `4-ref/2` : 二. 兼容非原始类型
+- `4-ref/3` : 三. shallowRef 的实现

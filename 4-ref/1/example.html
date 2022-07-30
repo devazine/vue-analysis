@@ -1,0 +1,18 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { ref } from './ref.js';
+  import { effect } from './effect.js';
+  const div = document.querySelector('div');
+  const msg = ref('Hello!');
+  
+  effect(() => {
+    div.innerText = msg.value;
+  });
+
+  setTimeout(() => {
+    msg.value = 'Bye~'
+  }, 1000)
+</script>
