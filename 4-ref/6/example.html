@@ -1,0 +1,20 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { ref, proxyRefs } from './ref.js';
+  import { effect } from './effect.js';
+  import { reactive } from './reactive.js';
+
+  const div = document.querySelector('div');
+  
+  const info = ref('Hello');
+  const obj = proxyRefs({ info });
+  
+  effect(() => {
+    div.innerText = obj.info
+  });
+  
+  obj.info = 'Bye~'; 
+</script>

@@ -1,0 +1,26 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { toRef, toRefs } from './ref.js';
+  import { effect } from './effect.js';
+  import { reactive } from './reactive.js';
+
+  const div = document.querySelector('div');
+  const obj = reactive({msg: 'Hello!'});
+  
+  effect(() => {
+    div.innerText = obj.msg
+  });
+
+  setTimeout(() => {
+    const m = toRef(obj, 'msg');
+    m.value = 'OK~';  // 可以触发副作用函数
+  }, 1000);
+
+  setTimeout(() => {
+    const { msg } = toRefs(obj);
+    msg.value = 'Bye~';  // 可以触发副作用函数
+  }, 2000);
+</script>

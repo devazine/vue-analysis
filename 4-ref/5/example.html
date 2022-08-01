@@ -1,0 +1,41 @@
+<body>
+  <div></div>
+</body>
+
+<script type="module">
+  import { customRef } from './ref.js';
+  import { effect } from './effect.js';
+  import { reactive } from './reactive.js';
+
+  const div = document.querySelector('div');
+  
+  // 只接受偶数的 ref
+  function useEvenRef(value = 0) {
+    return customRef((track, trigger) => {
+      return {
+        get() {
+          track();
+          return value
+        },
+        set(newValue) {
+          if (newValue % 2 === 0) {  // 偶数才执行
+            value = newValue
+            trigger()
+          }
+        }
+      }
+    })
+  }
+  
+  let num = useEvenRef();
+  
+  effect(() => {
+    div.innerText = num.value
+  });
+  
+  let count = 0;
+  setInterval(() => {
+    ++count;
+    num.value = count;
+  }, 500);
+</script>
